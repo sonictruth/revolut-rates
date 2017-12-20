@@ -1,12 +1,12 @@
 {
   "name": "Revolut Rates",
-  "short_name": "RevRates",
+  "short_name": "Revolut Rates",
   "theme_color": "#2196f3",
   "background_color": "#ffffff",
   "display": "fullscreen",
   "orientation": "portrait",
-  "Scope": "/",
-  "start_url": "/",
+  "Scope": "/revolut-rates/",
+  "start_url": "/revolut-rates/",
   "icons": [
     {
       "src": "images/icons/icon-72x72.png",
