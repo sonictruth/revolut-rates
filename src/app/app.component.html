@@ -18,7 +18,7 @@
       </mat-expansion-panel-header>
       <div class="form-container">
         <mat-form-field>
-          <input matInput type="number" placeholder="Ammount" [(ngModel)]="newExchange.ammount">
+          <input matInput type="number" placeholder="Amount" [(ngModel)]="newExchange.amount">
         </mat-form-field>
         <mat-form-field>
           <mat-select placeholder="From" [(value)]="newExchange.from">
@@ -58,9 +58,9 @@
       <mat-cell *matCellDef="let element"> {{element.to}} </mat-cell>
     </ng-container>
 
-    <ng-container matColumnDef="ammount">
-      <mat-header-cell *matHeaderCellDef> Ammount </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.ammount}} </mat-cell>
+    <ng-container matColumnDef="amount">
+      <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.amount}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="result">

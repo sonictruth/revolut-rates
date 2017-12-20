@@ -13,12 +13,12 @@ import { Observable } from 'rxjs/Observable';
 })
 export class AppComponent implements OnInit {
   loading = false;
-  displayedColumns = ['from', 'to', 'ammount', 'result'];
+  displayedColumns = ['from', 'to', 'amount', 'result'];
   dataSource = null;
   newExchange = {
     to: null,
     from: null,
-    ammount: null
+    amount: null
   };
   storageName = 'rates';
   userExchanges = [];
@@ -47,7 +47,7 @@ export class AppComponent implements OnInit {
     Observable.forkJoin(obs)
       .subscribe(data => {
         const displayRates = data.map(d => {
-          d[0].result = d[0].ammount * d[1].rate;
+          d[0].result = (d[0].amount * d[1].rate).toFixed(2);
           return d[0];
         });
         this.dataSource = new MatTableDataSource<Rate>(displayRates);
@@ -55,14 +55,14 @@ export class AppComponent implements OnInit {
       });
   }
   add() {
-    if (!this.newExchange.from || !this.newExchange.to || !this.newExchange.ammount) {
+    if (!this.newExchange.from || !this.newExchange.to || !this.newExchange.amount) {
       return;
     }
     this.userExchanges.push(Object.assign({}, this.newExchange));
     this.newExchange = {
       to: null,
       from: null,
-      ammount: null
+      amount: null
     };
     this.saveToStorage();
   }
@@ -93,6 +93,6 @@ export class AppComponent implements OnInit {
 export interface Rate {
   from: string;
   to: string;
-  ammount: number;
+  amount: number;
   result: number;
 }
