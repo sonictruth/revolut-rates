@@ -3,6 +3,7 @@ import { MatTableDataSource } from '@angular/material';
 import { Http, Response } from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
@@ -11,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  loading = false;
   displayedColumns = ['from', 'to', 'ammount', 'result'];
   dataSource = null;
   newExchange = {
@@ -29,29 +31,28 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.loadRates();
-    this.httpRequest();
-  }
-  httpRequest() {
-    const x = this.http.get('https://cors-anywhere.herokuapp.com/https://www.revolut.com/api/quote/internal/BTCGBP')
-      .map((res: Response) => res.json());
-    Observable.forkJoin([x])
-      .subscribe(data => {
-        console.log('yyyy', data);
-      });
   }
   loadRates() {
+    this.loading = true;
     this.dataSource = null;
-    let displayRates: Rate[] = [];
     this.loadFromStorage();
-    displayRates = this.userExchanges.map(ex => {
-      return {
-        ammount: ex.ammount,
-        to: ex.to,
-        from: ex.from,
-        result: 0
-      };
-    });
-    this.dataSource = new MatTableDataSource<Rate>(displayRates);
+    const obs = this.userExchanges.map(ue =>
+      Observable.forkJoin([Observable.of(ue), this.http.get(
+        `https://cors-anywhere.herokuapp.com/https://www.revolut.com/api/quote/internal/${ue.from}${ue.to}`
+      ).map((res: Response) => res.json())])
+    );
+    if (obs.length === 0) {
+      this.loading = false;
+    }
+    Observable.forkJoin(obs)
+      .subscribe(data => {
+        const displayRates = data.map(d => {
+          d[0].result = d[0].ammount * d[1].rate;
+          return d[0];
+        });
+        this.dataSource = new MatTableDataSource<Rate>(displayRates);
+        this.loading = false;
+      });
   }
   add() {
     if (!this.newExchange.from || !this.newExchange.to || !this.newExchange.ammount) {
