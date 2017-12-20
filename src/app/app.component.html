@@ -22,14 +22,14 @@
         </mat-form-field>
         <mat-form-field>
           <mat-select placeholder="From" [(value)]="newExchange.from">
-            <mat-option *ngFor="let currency of currencies" [value]="currency">
+            <mat-option *ngFor="let currency of filter(currencies, newExchange.to)" [value]="currency">
               {{ currency }}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field>
           <mat-select placeholder="To" [(value)]="newExchange.to">
-            <mat-option *ngFor="let currency of currencies" [value]="currency">
+            <mat-option *ngFor="let currency of filter(currencies, newExchange.from)" [value]="currency">
               {{ currency }}
             </mat-option>
           </mat-select>

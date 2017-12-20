@@ -82,6 +82,12 @@ export class AppComponent implements OnInit {
       this.userExchanges = [];
     }
   }
+  filter(currencies, keyword) {
+    if (!keyword) {
+      return currencies;
+    }
+    return currencies.filter( c => c !== keyword);
+  }
 }
 
 export interface Rate {
