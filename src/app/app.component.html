@@ -32,7 +32,7 @@
           </mat-select>
         </mat-form-field>
         <mat-form-field>
-          <input matInput type="number" placeholder="{{newPortofolioItem.from}} Amount Paied" [(ngModel)]="newPortofolioItem.cost">
+          <input matInput type="number" placeholder="{{newPortofolioItem.from}} Amount Paid" [(ngModel)]="newPortofolioItem.cost">
         </mat-form-field>
         <mat-form-field>
           <input matInput type="number" placeholder="{{newPortofolioItem.to}} Amount Bought" [(ngModel)]="newPortofolioItem.amount">
@@ -76,7 +76,7 @@
           <div>Rate Diff: <br>
             <strong [className]="element.winning ? 'green' : 'red'">{{element.rateDiff}}</strong>
           </div>
-          <div>Paied: <br>
+          <div>Paid: <br>
             <strong>{{element.cost}} {{element.from}}</strong>
           </div>
           <div>Value Now: <br>
