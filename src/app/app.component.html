@@ -47,6 +47,9 @@
         <button *ngIf="dataSource && dataSource.data.length > 0" (click)="clearStorage()" mat-raised-button color="warn">
           <mat-icon>delete</mat-icon> Remove all
         </button>
+        <button (click)="loadDemo()" mat-raised-button color="secondary">
+          <mat-icon>euro_symbol</mat-icon> Load demo
+        </button>
       </div>
     </mat-expansion-panel>
   </mat-accordion>
@@ -64,15 +67,15 @@
       <ng-container matColumnDef="results">
         <mat-header-cell *matHeaderCellDef> </mat-header-cell>
         <mat-cell *matCellDef="let element">
-            <div>Rate Then:
-                <strong>{{element.rateThen}}</strong>
-              </div>
-              <div>Rate Now:
-                <strong>{{element.rateNow}}</strong>
-              </div>
-              <div>Rate Diff:
-                <strong [className]="element.winning ? 'green' : 'red'">{{element.rateDiff}}</strong>
-              </div>
+          <div>Rate Then:
+            <strong>{{element.rateThen}}</strong>
+          </div>
+          <div>Rate Now:
+            <strong>{{element.rateNow}}</strong>
+          </div>
+          <div>Rate Diff:
+            <strong [className]="element.winning ? 'green' : 'red'">{{element.rateDiff}}</strong>
+          </div>
           <div>Payed:
             <strong>{{element.cost}} {{element.from}}</strong>
           </div>

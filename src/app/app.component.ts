@@ -12,6 +12,30 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  demoData = [{
+    'id': '08600f28-265e-a68f-51a8-411f584dc21a',
+    'to': 'BTC', 'from': 'EUR',
+    'amount': 0.035,
+    'cost': 413.8
+  },
+  {
+    'id': '27e794d6-08ce-1ece-b2df-b914af23116e',
+    'to': 'BTC',
+    'from': 'EUR',
+    'amount': 0.035, 'cost': 500.33
+  },
+  {
+    'id': 'b2dc3621-6118-632a-c908-3796fb62a8c7',
+    'to': 'ETH', 'from': 'EUR', 'amount': 0.35, 'cost': 197.58
+  },
+  {
+    'id': '2d3a1f25-8e03-2168-e5f0-b84e4fd9cf5f',
+    'to': 'LTC', 'from': 'EUR', 'amount': 0.6084936, 'cost': 150
+  },
+  {
+    'id': '05fa4779-72ed-94e5-faec-7cb9477b9024', 'to': 'LTC', 'from': 'EUR',
+    'amount': 0.17823969, 'cost': 50
+  }];
   loading = false;
   displayedColumns = ['amount', 'results', 'direction', 'action'];
   dataSource = null;
@@ -59,8 +83,8 @@ export class AppComponent implements OnInit {
           exchangePairs[`${exchangeRate.from}${exchangeRate.to}`] = exchangeRate.rate;
         });
         let total = 0;
-        const displayItems = this.portofolioItems.map( portofolioItem => {
-          const displayItem = {...portofolioItem};
+        const displayItems = this.portofolioItems.map(portofolioItem => {
+          const displayItem = { ...portofolioItem };
           const rateNow = exchangePairs[`${portofolioItem.to}${portofolioItem.from}`];
           const rateThen = portofolioItem.cost / portofolioItem.amount;
           const rateDiff = rateNow - rateThen;
@@ -99,11 +123,16 @@ export class AppComponent implements OnInit {
     this.saveToStorage();
   }
   removePortofolioItem(id) {
-    this.portofolioItems = this.portofolioItems.filter( item => item.id === id);
+    this.portofolioItems = this.portofolioItems.filter(item => item.id !== id);
     this.saveToStorage();
   }
   clearStorage() {
     localStorage.removeItem(this.storageName);
+    this.loadRates();
+  }
+  loadDemo() {
+    this.portofolioItems = this.demoData;
+    localStorage.setItem(this.storageName, JSON.stringify(this.portofolioItems));
     this.loadRates();
   }
   saveToStorage() {
