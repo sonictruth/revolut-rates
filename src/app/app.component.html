@@ -32,7 +32,7 @@
           </mat-select>
         </mat-form-field>
         <mat-form-field>
-          <input matInput type="number" placeholder="{{newPortofolioItem.from}} Amount Payed" [(ngModel)]="newPortofolioItem.cost">
+          <input matInput type="number" placeholder="{{newPortofolioItem.from}} Amount Paied" [(ngModel)]="newPortofolioItem.cost">
         </mat-form-field>
         <mat-form-field>
           <input matInput type="number" placeholder="{{newPortofolioItem.to}} Amount Bought" [(ngModel)]="newPortofolioItem.amount">
@@ -47,8 +47,8 @@
         <button *ngIf="dataSource && dataSource.data.length > 0" (click)="clearStorage()" mat-raised-button color="warn">
           <mat-icon>delete</mat-icon> Remove all
         </button>
-        <button (click)="loadDemo()" mat-raised-button color="secondary">
-          <mat-icon>euro_symbol</mat-icon> Load demo
+        <button *ngIf="!dataSource || dataSource.data.length === 0" (click)="loadDemo()" mat-raised-button color="secondary">
+          <mat-icon>euro_symbol</mat-icon> Load Demo
         </button>
       </div>
     </mat-expansion-panel>
@@ -67,22 +67,22 @@
       <ng-container matColumnDef="results">
         <mat-header-cell *matHeaderCellDef> </mat-header-cell>
         <mat-cell *matCellDef="let element">
-          <div>Rate Then:
+          <div>Rate Then: <br>
             <strong>{{element.rateThen}}</strong>
           </div>
-          <div>Rate Now:
+          <div>Rate Now: <br>
             <strong>{{element.rateNow}}</strong>
           </div>
-          <div>Rate Diff:
+          <div>Rate Diff: <br>
             <strong [className]="element.winning ? 'green' : 'red'">{{element.rateDiff}}</strong>
           </div>
-          <div>Payed:
+          <div>Paied: <br>
             <strong>{{element.cost}} {{element.from}}</strong>
           </div>
-          <div>Value Now:
+          <div>Value Now: <br>
             <strong>{{element.valueNow}} {{element.from}}</strong>
           </div>
-          <div>Diff:
+          <div>Diff: <br>
             <strong [className]="element.winning ? 'green' : 'red'">{{element.valueDiff}} {{element.from}}</strong>
           </div>
         </mat-cell>
