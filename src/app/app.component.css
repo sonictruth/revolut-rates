@@ -6,3 +6,39 @@
 .form-container>* {
   width: 100%;
 }
+
+.mat-row {
+  align-items: initial;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.mat-column-action {
+  max-width: 40px;
+  text-align: center;
+}
+
+.mat-column-direction {
+  text-align: center;
+}
+
+.amount {
+  font-size: 13px;
+}
+
+.green {
+  color: darkgreen
+}
+
+.red {
+  color: darkred;
+}
+.table {
+  padding-top: 10px;
+}
+.total {
+  font-family: Roboto,"Helvetica Neue",sans-serif;
+  color: darkgray;
+  padding: 20px;
+  font-size: 13px;
+}

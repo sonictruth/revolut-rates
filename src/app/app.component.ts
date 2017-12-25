@@ -13,15 +13,17 @@ import { Observable } from 'rxjs/Observable';
 })
 export class AppComponent implements OnInit {
   loading = false;
-  displayedColumns = ['from', 'to', 'amount', 'result'];
+  displayedColumns = ['amount', 'rate', 'results', 'direction', 'action'];
   dataSource = null;
-  newExchange = {
+  newPortofolioItem = {
     to: null,
     from: null,
-    amount: null
+    amount: null,
+    cost: null,
   };
   storageName = 'rates';
-  userExchanges = [];
+  portofolioItems = [];
+  total;
   currencies = ['BTC', 'ETH', 'LTC', 'EUR', 'GBP', 'USD', 'AUD', 'CAD', 'CZK', 'DKK', 'HKD', 'HUF', 'ILS', 'JPY',
     'MXN', 'NZD', 'NOK', 'PLN', 'RON', 'SGD', 'ZAR', 'SEK', 'CHF', 'THB', 'TRY', 'AED', 'BGN', 'SAR', 'QAR'];
 
@@ -33,66 +35,104 @@ export class AppComponent implements OnInit {
     this.loadRates();
   }
   loadRates() {
-    this.loading = true;
     this.dataSource = null;
     this.loadFromStorage();
-    const obs = this.userExchanges.map(ue =>
-      Observable.forkJoin([Observable.of(ue), this.http.get(
-        `https://cors-anywhere.herokuapp.com/https://www.revolut.com/api/quote/internal/${ue.from}${ue.to}`
-      ).map((res: Response) => res.json())])
-    );
-    if (obs.length === 0) {
-      this.loading = false;
+    const exchangePairs = this.portofolioItems.reduce((acc, cur) => {
+      acc[`${cur.to}${cur.from}`] = 0;
+      return acc;
+    }, {});
+
+    if (this.portofolioItems.length === 0) {
+      return;
     }
+    this.loading = true;
+
+    const obs = Object.keys(exchangePairs).map(exchangePair =>
+      this.http.get(
+        `https://cors-anywhere.herokuapp.com/https://www.revolut.com/api/quote/internal/${exchangePair}`
+      ).map((res: Response) => res.json())
+    );
+
     Observable.forkJoin(obs)
-      .subscribe(data => {
-        const displayRates = data.map(d => {
-          d[0].result = (d[0].amount * d[1].rate).toFixed(2);
-          return d[0];
+      .subscribe(exchangeRates => {
+        exchangeRates.forEach(exchangeRate => {
+          exchangePairs[`${exchangeRate.from}${exchangeRate.to}`] = exchangeRate.rate;
         });
-        this.dataSource = new MatTableDataSource<Rate>(displayRates);
+        let total = 0;
+        const displayItems = this.portofolioItems.map( portofolioItem => {
+          const displayItem = {...portofolioItem};
+          const rateNow = exchangePairs[`${portofolioItem.to}${portofolioItem.from}`];
+          const rateThen = portofolioItem.cost / portofolioItem.amount;
+          const rateDiff = rateNow - rateThen;
+          const valueNow = portofolioItem.amount * rateNow;
+          const valueDiff = valueNow - portofolioItem.cost;
+          displayItem.ammount = displayItem.amount.toFixed(2);
+          displayItem.rateNow = rateNow.toFixed(2);
+          displayItem.rateThen = rateThen.toFixed(2);
+          displayItem.rateDiff = rateDiff.toFixed(2);
+          displayItem.valueNow = valueNow.toFixed(2);
+          displayItem.diff = valueNow.toFixed(2);
+          displayItem.valueDiff = valueDiff.toFixed(2);
+          displayItem.winning = (rateDiff > 0);
+          total = (total + valueDiff);
+          return displayItem;
+        });
+        this.total = total.toFixed(2);
+        this.dataSource = new MatTableDataSource(displayItems);
         this.loading = false;
       });
   }
-  add() {
-    if (!this.newExchange.from || !this.newExchange.to || !this.newExchange.amount) {
+  addPortofolioItem() {
+    if (!this.newPortofolioItem.from ||
+      !this.newPortofolioItem.to ||
+      !this.newPortofolioItem.amount ||
+      !this.newPortofolioItem.cost) {
       return;
     }
-    this.userExchanges.push(Object.assign({}, this.newExchange));
-    this.newExchange = {
+    this.portofolioItems.push(Object.assign({ id: this.guid() }, this.newPortofolioItem));
+    this.newPortofolioItem = {
       to: null,
       from: null,
-      amount: null
+      amount: null,
+      cost: null
     };
     this.saveToStorage();
   }
-  clear() {
+  removePortofolioItem(id) {
+    this.portofolioItems = this.portofolioItems.filter( item => item.id === id);
+    this.saveToStorage();
+  }
+  clearStorage() {
     localStorage.removeItem(this.storageName);
     this.loadRates();
   }
   saveToStorage() {
-    localStorage.setItem(this.storageName, JSON.stringify(this.userExchanges));
+    localStorage.setItem(this.storageName, JSON.stringify(this.portofolioItems));
     this.loadRates();
   }
   loadFromStorage() {
     const data = localStorage.getItem(this.storageName);
     if (data) {
-      this.userExchanges = JSON.parse(data);
+      this.portofolioItems = JSON.parse(data);
     } else {
-      this.userExchanges = [];
+      this.portofolioItems = [];
     }
   }
   filter(currencies, keyword) {
     if (!keyword) {
       return currencies;
     }
-    return currencies.filter( c => c !== keyword);
+    return currencies.filter(c => c !== keyword);
+  }
+  guid() {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4();
   }
 }
 
-export interface Rate {
-  from: string;
-  to: string;
-  amount: number;
-  result: number;
-}
+

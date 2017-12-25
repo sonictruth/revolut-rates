@@ -1,6 +1,6 @@
 <div>
   <mat-toolbar color="primary">
-    <span>Revolut Exchange Rates
+    <span>Revolut Portofolio
       <button (click)="loadRates()" mat-icon-button color="secondary">
         <mat-icon>refresh</mat-icon>
       </button>
@@ -13,64 +13,110 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
-          Add exchange rate
+          Add Portofolio Item
         </mat-panel-title>
       </mat-expansion-panel-header>
       <div class="form-container">
         <mat-form-field>
-          <input matInput type="number" placeholder="Amount" [(ngModel)]="newExchange.amount">
-        </mat-form-field>
-        <mat-form-field>
-          <mat-select placeholder="From" [(value)]="newExchange.from">
-            <mat-option *ngFor="let currency of filter(currencies, newExchange.to)" [value]="currency">
+          <mat-select placeholder="From" [(value)]="newPortofolioItem.from">
+            <mat-option *ngFor="let currency of filter(currencies, newPortofolioItem.to)" [value]="currency">
               {{ currency }}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field>
-          <mat-select placeholder="To" [(value)]="newExchange.to">
-            <mat-option *ngFor="let currency of filter(currencies, newExchange.from)" [value]="currency">
+          <mat-select placeholder="To" [(value)]="newPortofolioItem.to">
+            <mat-option *ngFor="let currency of filter(currencies, newPortofolioItem.from)" [value]="currency">
               {{ currency }}
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-form-field>
+          <input matInput type="number" placeholder="{{newPortofolioItem.from}} Amount Payed" [(ngModel)]="newPortofolioItem.cost">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="number" placeholder="{{newPortofolioItem.to}} Amount Bought" [(ngModel)]="newPortofolioItem.amount">
+        </mat-form-field>
+
+
       </div>
       <div>
-          <button (click)="add()" mat-icon-button color="primary">
-            <mat-icon>add</mat-icon>
-          </button>
-          <button (click)="clear()" mat-icon-button color="warn">
-            <mat-icon>delete</mat-icon>
-          </button>
-     </div>
+        <button (click)="addPortofolioItem()" mat-raised-button color="primary">
+          <mat-icon>add</mat-icon> Add
+        </button>
+        <button *ngIf="dataSource && dataSource.data.length > 0" (click)="clearStorage()" mat-raised-button color="warn">
+          <mat-icon>delete</mat-icon> Remove all
+        </button>
+      </div>
     </mat-expansion-panel>
   </mat-accordion>
+  <div class='table'>
+    <mat-table #table [dataSource]="dataSource" *ngIf="dataSource && dataSource.data.length > 0">
 
-  <mat-table #table [dataSource]="dataSource" *ngIf="dataSource && dataSource.data.length > 0">
 
-    <ng-container matColumnDef="from">
-      <mat-header-cell *matHeaderCellDef> From </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.from}} </mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="amount">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <div class="amount">{{element.amount}} {{element.to}}</div>
+        </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="to">
-      <mat-header-cell *matHeaderCellDef> To </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.to}} </mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="rate">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <div>Rate Then:
+            <strong>{{element.rateThen}}</strong>
+          </div>
+          <div>Rate Now:
+            <strong>{{element.rateNow}}</strong>
+          </div>
+          <div>Rate Diff:
+            <strong [className]="element.winning ? 'green' : 'red'">{{element.rateDiff}}</strong>
+          </div>
+        </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="amount">
-      <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.amount}} </mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="results">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <div>Payed:
+            <strong>{{element.cost}} {{element.from}}</strong>
+          </div>
+          <div>Value Now:
+            <strong>{{element.valueNow}} {{element.from}}</strong>
+          </div>
+          <div>Diff:
+            <strong [className]="element.winning ? 'green' : 'red'">{{element.valueDiff}} {{element.from}}</strong>
+          </div>
+        </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="result">
-      <mat-header-cell *matHeaderCellDef> Result </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.result}} </mat-cell>
-    </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-  </mat-table>
+      <ng-container matColumnDef="direction">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <div [className]="element.winning ? 'green' : 'red'">
+            <mat-icon *ngIf='element.winning'>arrow_upward</mat-icon>
+            <mat-icon *ngIf='!element.winning'>arrow_downward</mat-icon>
+          </div>
+        </mat-cell>
+      </ng-container>
 
+      <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button (click)="removePortofolioItem(element.id)" mat-icon-button color="warn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+  </div>
+  <div *ngIf="dataSource && dataSource.data.length > 0" class='total'>
+    Total: {{total}}
+  </div>
 
 </div>
