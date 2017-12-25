@@ -13,7 +13,7 @@ import { Observable } from 'rxjs/Observable';
 })
 export class AppComponent implements OnInit {
   loading = false;
-  displayedColumns = ['amount', 'rate', 'results', 'direction', 'action'];
+  displayedColumns = ['amount', 'results', 'direction', 'action'];
   dataSource = null;
   newPortofolioItem = {
     to: null,

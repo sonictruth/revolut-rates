@@ -61,24 +61,18 @@
         </mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef="rate">
-        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          <div>Rate Then:
-            <strong>{{element.rateThen}}</strong>
-          </div>
-          <div>Rate Now:
-            <strong>{{element.rateNow}}</strong>
-          </div>
-          <div>Rate Diff:
-            <strong [className]="element.winning ? 'green' : 'red'">{{element.rateDiff}}</strong>
-          </div>
-        </mat-cell>
-      </ng-container>
-
       <ng-container matColumnDef="results">
         <mat-header-cell *matHeaderCellDef> </mat-header-cell>
         <mat-cell *matCellDef="let element">
+            <div>Rate Then:
+                <strong>{{element.rateThen}}</strong>
+              </div>
+              <div>Rate Now:
+                <strong>{{element.rateNow}}</strong>
+              </div>
+              <div>Rate Diff:
+                <strong [className]="element.winning ? 'green' : 'red'">{{element.rateDiff}}</strong>
+              </div>
           <div>Payed:
             <strong>{{element.cost}} {{element.from}}</strong>
           </div>
